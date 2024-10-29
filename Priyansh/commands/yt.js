@@ -1,46 +1,46 @@
 const ytdl = require('ytdl-core');
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegPath = require('ffmpeg-static');
+const search = require('youtube-search');
+const fs = require('fs');
 const path = require('path');
+
+const opts = {
+    maxResults: 1,
+    key: 'YOUR_YOUTUBE_API_KEY', // Replace with your YouTube API key
+};
 
 module.exports = {
     name: "yt",
     version: "1.0.0",
-    hasPermission: 2,
+    hasPermssion: 2,
     credits: "𝐏𝐫𝐢𝐲𝐚𝐧𝐬𝐡 𝐑𝐚𝐣𝐩𝐮𝐭",
-    description: "Download YouTube video as MP3",
+    description: "Downloads a YouTube video as MP3.",
     commandCategory: "Admin",
-    usages: "yt [url]",
-    run: async (client, message, args) => {
-        // Check if a URL was provided
-        const url = args[0];
-        if (!url) {
-            return message.reply("Please provide a valid YouTube video URL.");
+    usages: ".yt [song name]",
+    async run(client, message, args) {
+        const songName = args.join(' ');
+        if (!songName) {
+            return message.reply('Please provide a song name!');
         }
 
-        try {
-            // Get video info
-            const info = await ytdl.getInfo(url);
-            const title = info.videoDetails.title.replace(/[<>:"/\\|?*]+/g, ''); // Clean title for filename
-            const outputPath = path.resolve(__dirname, `${title}.mp3`);
+        // Search for the video
+        search(songName, opts, (err, results) => {
+            if (err) return message.reply('An error occurred while searching.');
 
-            // Start downloading the video and convert to MP3
-            ffmpeg(ytdl(url, { quality: 'highestaudio' }))
-                .setFfmpegPath(ffmpegPath) // Set FFmpeg path
-                .audioBitrate(128)
-                .save(outputPath)
-                .on('end', () => {
-                    message.reply(`Downloaded and converted "${title}" to MP3 successfully!`);
-                    // Optionally, you can send the MP3 file as a message
-                    // message.channel.send({ files: [outputPath] });
+            const videoUrl = results[0].link;
+
+            // Download the video as MP3
+            const outputPath = path.join(__dirname, 'downloads', `${songName}.mp3`);
+            ytdl(videoUrl, { quality: 'highestaudio' })
+                .pipe(fs.createWriteStream(outputPath))
+                .on('finish', () => {
+                    message.channel.send({ files: [outputPath] });
                 })
-                .on('error', (err) => {
-                    console.error('Error downloading or converting:', err);
-                    message.reply('Error downloading or converting the video. Please try again later.');
+                .on('error', (error) => {
+                    console.error(error);
+                    message.reply('There was an error downloading the video.');
                 });
-        } catch (error) {
-            console.error('Error fetching video information:', error);
-            message.reply('Error fetching video information. Please ensure the URL is valid.');
-        }
+        });
     }
 };
