@@ -1,46 +1,46 @@
 const ytdl = require('ytdl-core');
-const { search } = require('youtube-search-api');
-const fs = require('fs');
+const ffmpeg = require('fluent-ffmpeg');
+const ffmpegPath = require('ffmpeg-static');
 const path = require('path');
 
-// Command Metadata
-const commandInfo = {
+module.exports = {
     name: "yt",
     version: "1.0.0",
-    hasPermission: 1, // Permission level (1 = general user, 2 = admin)
+    hasPermission: 2,
     credits: "𝐏𝐫𝐢𝐲𝐚𝐧𝐬𝐡 𝐑𝐚𝐣𝐩𝐮𝐭",
-    description: "Search and download YouTube videos by song name",
-    commandCategory: "YouTube",
-    usages: "yt <song name>"
+    description: "Download YouTube video as MP3",
+    commandCategory: "Admin",
+    usages: "yt [url]",
+    run: async (client, message, args) => {
+        // Check if a URL was provided
+        const url = args[0];
+        if (!url) {
+            return message.reply("Please provide a valid YouTube video URL.");
+        }
+
+        try {
+            // Get video info
+            const info = await ytdl.getInfo(url);
+            const title = info.videoDetails.title.replace(/[<>:"/\\|?*]+/g, ''); // Clean title for filename
+            const outputPath = path.resolve(__dirname, `${title}.mp3`);
+
+            // Start downloading the video and convert to MP3
+            ffmpeg(ytdl(url, { quality: 'highestaudio' }))
+                .setFfmpegPath(ffmpegPath) // Set FFmpeg path
+                .audioBitrate(128)
+                .save(outputPath)
+                .on('end', () => {
+                    message.reply(`Downloaded and converted "${title}" to MP3 successfully!`);
+                    // Optionally, you can send the MP3 file as a message
+                    // message.channel.send({ files: [outputPath] });
+                })
+                .on('error', (err) => {
+                    console.error('Error downloading or converting:', err);
+                    message.reply('Error downloading or converting the video. Please try again later.');
+                });
+        } catch (error) {
+            console.error('Error fetching video information:', error);
+            message.reply('Error fetching video information. Please ensure the URL is valid.');
+        }
+    }
 };
-
-async function downloadYouTubeVideo(songName) {
-    const searchResults = await search(songName, { type: 'video' });
-    
-    if (searchResults.items && searchResults.items.length > 0) {
-        const videoId = searchResults.items[0].id;
-        const videoURL = `https://www.youtube.com/watch?v=${videoId}`;
-        const outputPath = path.resolve(__dirname, `${songName}.mp4`);
-
-        ytdl(videoURL)
-            .pipe(fs.createWriteStream(outputPath))
-            .on('finish', () => {
-                console.log(`Download completed: ${outputPath}`);
-            });
-
-        return `Video is being downloaded: ${outputPath}`;
-    } else {
-        return 'Video nahi mil saki!';
-    }
-}
-
-// Command handler
-async function handleMessage(message) {
-    if (message.startsWith('yt ')) {
-        const songName = message.replace('yt ', '').trim();
-        const downloadMessage = await downloadYouTubeVideo(songName);
-        return downloadMessage;
-    } else if (message === "yt help") {
-        return `**Command Information**\n\n- **Name:** ${commandInfo.name}\n- **Version:** ${commandInfo.version}\n- **Permission Level:** ${commandInfo.hasPermission}\n- **Credits:** ${commandInfo.credits}\n- **Description:** ${commandInfo.description}\n- **Category:** ${commandInfo.commandCategory}\n- **Usage:** ${commandInfo.usages}\n\nUse this command by typing "${commandInfo.usages}" to download a song.`;
-    }
-}
