@@ -3,6 +3,11 @@ const { search } = require('youtube-search-api');
 const fs = require('fs');
 const path = require('path');
 
+// Metadata
+const creatorName = "Zain Jutt";
+const commandCategory = "YouTube";
+const commandUsage = "yt <song name>";
+
 async function downloadYouTubeVideo(songName) {
     const searchResults = await search(songName, { type: 'video' });
     
@@ -29,5 +34,7 @@ async function handleMessage(message) {
         const songName = message.replace('yt ', '').trim();
         const downloadMessage = await downloadYouTubeVideo(songName);
         return downloadMessage;
+    } else if (message === "yt help") {
+        return `**Command Information**\n\n- **Creator:** ${creatorName}\n- **Category:** ${commandCategory}\n- **Usage:** ${commandUsage}\n\nUse this command by typing "yt <song name>" to download a song.`;
     }
 }
