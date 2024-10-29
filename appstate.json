@@ -1,33 +1,119 @@
-const ytdl = require('ytdl-core');
-const { search } = require('youtube-search-api');
-const fs = require('fs');
-const path = require('path');
-
-async function downloadYouTubeVideo(songName) {
-    const searchResults = await search(songName, { type: 'video' });
-    
-    if (searchResults.items && searchResults.items.length > 0) {
-        const videoId = searchResults.items[0].id;
-        const videoURL = `https://www.youtube.com/watch?v=${videoId}`;
-        const outputPath = path.resolve(__dirname, `${songName}.mp4`);
-
-        ytdl(videoURL)
-            .pipe(fs.createWriteStream(outputPath))
-            .on('finish', () => {
-                console.log(`Download completed: ${outputPath}`);
-            });
-
-        return `Video is being downloaded: ${outputPath}`;
-    } else {
-        return 'Video nahi mil saki!';
+[
+    {
+        "key": "dbln",
+        "value": "%7B%2261566479789589%22%3A%22EhYWl9BV%22%2C%22100094196693539%22%3A%22CGEu1UTy%22%2C%2261554236400769%22%3A%22u0CWxtu2%22%2C%2261567632540715%22%3A%22opGXEGCs%22%2C%2261567751309015%22%3A%225DPaFxnr%22%2C%2261566408789854%22%3A%22AwfMvo9c%22%2C%22100086033644262%22%3A%22yscPEMjZ%22%2C%2261566411242730%22%3A%22bPZ6pR5F%22%7D",
+        "domain": "facebook.com",
+        "path": "/login/device-based/",
+        "hostOnly": false,
+        "creation": "2024-10-29T10:23:32.515Z",
+        "lastAccessed": "2024-10-29T10:23:32.515Z"
+    },
+    {
+        "key": "sb",
+        "value": "A2oRZyAvm0TOpbjLaqQlVcew",
+        "domain": "facebook.com",
+        "path": "/",
+        "hostOnly": false,
+        "creation": "2024-10-29T10:23:32.515Z",
+        "lastAccessed": "2024-10-29T10:23:32.515Z"
+    },
+    {
+        "key": "ps_l",
+        "value": "1",
+        "domain": "facebook.com",
+        "path": "/",
+        "hostOnly": false,
+        "creation": "2024-10-29T10:23:32.515Z",
+        "lastAccessed": "2024-10-29T10:23:32.515Z"
+    },
+    {
+        "key": "ps_n",
+        "value": "1",
+        "domain": "facebook.com",
+        "path": "/",
+        "hostOnly": false,
+        "creation": "2024-10-29T10:23:32.515Z",
+        "lastAccessed": "2024-10-29T10:23:32.515Z"
+    },
+    {
+        "key": "datr",
+        "value": "ej8aZ0F6XiwVNuNrf0-2HJMg",
+        "domain": "facebook.com",
+        "path": "/",
+        "hostOnly": false,
+        "creation": "2024-10-29T10:23:32.515Z",
+        "lastAccessed": "2024-10-29T10:23:32.515Z"
+    },
+    {
+        "key": "vpd",
+        "value": "v1%3B688x360x3",
+        "domain": "facebook.com",
+        "path": "/",
+        "hostOnly": false,
+        "creation": "2024-10-29T10:23:32.515Z",
+        "lastAccessed": "2024-10-29T10:23:32.515Z"
+    },
+    {
+        "key": "c_user",
+        "value": "61568143521183",
+        "domain": "facebook.com",
+        "path": "/",
+        "hostOnly": false,
+        "creation": "2024-10-29T10:23:32.515Z",
+        "lastAccessed": "2024-10-29T10:23:32.515Z"
+    },
+    {
+        "key": "xs",
+        "value": "37%3A8KBSoDsjtEZU7Q%3A2%3A1730184255%3A-1%3A-1",
+        "domain": "facebook.com",
+        "path": "/",
+        "hostOnly": false,
+        "creation": "2024-10-29T10:23:32.515Z",
+        "lastAccessed": "2024-10-29T10:23:32.515Z"
+    },
+    {
+        "key": "oo",
+        "value": "v1%7C3%3A1730184257",
+        "domain": "facebook.com",
+        "path": "/",
+        "hostOnly": false,
+        "creation": "2024-10-29T10:23:32.515Z",
+        "lastAccessed": "2024-10-29T10:23:32.515Z"
+    },
+    {
+        "key": "wd",
+        "value": "360x688",
+        "domain": "facebook.com",
+        "path": "/",
+        "hostOnly": false,
+        "creation": "2024-10-29T10:23:32.515Z",
+        "lastAccessed": "2024-10-29T10:23:32.515Z"
+    },
+    {
+        "key": "locale",
+        "value": "en_US",
+        "domain": "facebook.com",
+        "path": "/",
+        "hostOnly": false,
+        "creation": "2024-10-29T10:23:32.515Z",
+        "lastAccessed": "2024-10-29T10:23:32.515Z"
+    },
+    {
+        "key": "fbl_st",
+        "value": "101320784%3BT%3A28836623",
+        "domain": "facebook.com",
+        "path": "/",
+        "hostOnly": false,
+        "creation": "2024-10-29T10:23:32.515Z",
+        "lastAccessed": "2024-10-29T10:23:32.515Z"
+    },
+    {
+        "key": "wl_cbv",
+        "value": "v2%3Bclient_version%3A2656%3Btimestamp%3A1730197408",
+        "domain": "facebook.com",
+        "path": "/",
+        "hostOnly": false,
+        "creation": "2024-10-29T10:23:32.515Z",
+        "lastAccessed": "2024-10-29T10:23:32.515Z"
     }
-}
-
-// Command handler
-async function handleMessage(message) {
-    if (message.startsWith('yt ')) {
-        const songName = message.replace('yt ', '').trim();
-        const downloadMessage = await downloadYouTubeVideo(songName);
-        return downloadMessage;
-    }
-}
+]
