@@ -3,10 +3,16 @@ const { search } = require('youtube-search-api');
 const fs = require('fs');
 const path = require('path');
 
-// Metadata
-const creatorName = "Zain Jutt";
-const commandCategory = "YouTube";
-const commandUsage = "yt <song name>";
+// Command Metadata
+const commandInfo = {
+    name: "yt",
+    version: "1.0.0",
+    hasPermission: 1, // Permission level (1 = general user, 2 = admin)
+    credits: "𝐏𝐫𝐢𝐲𝐚𝐧𝐬𝐡 𝐑𝐚𝐣𝐩𝐮𝐭",
+    description: "Search and download YouTube videos by song name",
+    commandCategory: "YouTube",
+    usages: "yt <song name>"
+};
 
 async function downloadYouTubeVideo(songName) {
     const searchResults = await search(songName, { type: 'video' });
@@ -35,6 +41,6 @@ async function handleMessage(message) {
         const downloadMessage = await downloadYouTubeVideo(songName);
         return downloadMessage;
     } else if (message === "yt help") {
-        return `**Command Information**\n\n- **Creator:** ${creatorName}\n- **Category:** ${commandCategory}\n- **Usage:** ${commandUsage}\n\nUse this command by typing "yt <song name>" to download a song.`;
+        return `**Command Information**\n\n- **Name:** ${commandInfo.name}\n- **Version:** ${commandInfo.version}\n- **Permission Level:** ${commandInfo.hasPermission}\n- **Credits:** ${commandInfo.credits}\n- **Description:** ${commandInfo.description}\n- **Category:** ${commandInfo.commandCategory}\n- **Usage:** ${commandInfo.usages}\n\nUse this command by typing "${commandInfo.usages}" to download a song.`;
     }
 }
